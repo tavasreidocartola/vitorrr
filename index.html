@@ -3,33 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento de Usuários</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Academia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>Gerenciamento de Usuários</h1>
-        <form id="userForm">
-            <input type="text" id="nome" placeholder="Nome" required>
-            <input type="date" id="data_nascimento" required>
-            <input type="email" id="email" placeholder="E-mail" required>
-            <input type="text" id="endereco" placeholder="Endereço" required>
-            <button type="submit">Adicionar Usuário</button>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="container bg-white p-6 rounded-lg shadow-lg max-w-4xl w-full">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Academia</h1>
+        
+        <!-- Formulário de Cadastro -->
+        <form id="userForm" class="space-y-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="nome" placeholder="Nome do Aluno" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="date" id="data_nascimento" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="email" id="email" placeholder="E-mail" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="endereco" placeholder="Endereço" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 md:col-span-2">
+            </div>
+            <button type="submit" id="addUserBtn" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition">Confirmar Aluno</button>
         </form>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Data de Nascimento</th>
-                    <th>E-mail</th>
-                    <th>Endereço</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="userList"></tbody>
-        </table>
+        <!-- Campo de Pesquisa -->
+        <div class="mb-6">
+            <input type="text" id="searchInput" placeholder="Pesquisar por nome ou e-mail..." class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Tabela de Alunos -->
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="p-3 text-left text-gray-700">ID</th>
+                        <th class="p-3 text-left text-gray-700">Nome</th>
+                        <th class="p-3 text-left text-gray-700">Data de Nascimento</th>
+                        <th class="p-3 text-left text-gray-700">E-mail</th>
+                        <th class="p-3 text-left text-gray-700">Endereço</th>
+                        <th class="p-3 text-left text-gray-700">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="userList"></tbody>
+            </table>
+        </div>
+
+        <!-- Modal de Edição -->
+        <div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Editar Aluno</h2>
+                <form id="editForm" class="space-y-4">
+                    <input type="hidden" id="editId">
+                    <input type="text" id="editNome" placeholder="Nome do Aluno" required class="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="date" id="editDataNascimento" required class="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="email" id="editEmail" placeholder="E-mail" required class="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="editEndereco" placeholder="Endereço" required class="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="flex justify-end gap-4">
+                        <button type="button" id="cancelEdit" class="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600 transition">Cancelar</button>
+                        <button type="submit" id="saveEditBtn" class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
