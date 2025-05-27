@@ -62,6 +62,182 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Formulário enviado!'); // Debug
+            
+            const nome = document.getElementById('nome').value.trim();
+            const data_nascimento = document.getElementById('data_nascimento').value;
+            const email = document.getElementById('email').value.trim();
+            const endereco = document.getElementById('endereco').value.trim();
+            
+            if (!nome || !data_nascimento || !email || !endereco) {
+                alert('Preencha todos os campos, mano!');
+                console.log('Campos incompletos:', { nome, data_nascimento, email, endereco });
+                return;
+            }
+            
+            if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                alert('E-mail inválido, mano! Tem que ter @ e um domínio tipo .com');
+                console.log('E-mail inválido:', email);
+                return;
+            }
+            
+            const user = {
+                id: Date.now(),
+                nome,
+                data_nascimento,
+                email,
+                endereco
+            };
+            
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            users.push(user);
+            localStorage.setItem('users', JSON.stringify(users));
+            console.log('Aluno salvo:', user); // Debug
+            console.log('Lista de usuários:', users); // Debug
+            
+            document.getElementById('userForm').reset();
+            renderUsers();
+        });
+
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = parseInt(document.getElementById('editId').value);
+            const nome = document.getElementById('editNome').value.trim();
+            const data_nascimento = document.getElementById('editDataNascimento').value;
+            const email = document.getElementById('editEmail').value.trim();
+            const endereco = document.getElementById('editEndereco').value.trim();
+            
+            if (!nome || !data_nascimento || !email || !endereco) {
+                alert('Preencha todos os campos, mano!');
+                console.log('Campos incompletos (editar):', { nome, data_nascimento, email, endereco });
+                return;
+            }
+            
+            if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                alert('E-mail inválido, mano! Tem que ter @ e um domínio tipo .com');
+                console.log('E-mail inválido (editar):', email);
+                return;
+            }
+            
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            users = users.map(user => 
+                user.id === id ? { id, nome, data_nascimento, email, endereco } : user
+            );
+            localStorage.setItem('users', JSON.stringify(users));
+            console.log('Aluno editado:', { id, nome, data_nascimento, email, endereco }); // Debug
+            
+            document.getElementById('editModal').classList.add('hidden');
+            renderUsers();
+        });
+
+        document.getElementById('cancelEdit').addEventListener('click', function() {
+            document.getElementById('editModal').classList.add('hidden');
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            renderUsers();
+        });
+
+        function renderUsers() {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            console.log('Usuários carregados:', users); // Debug
+            
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredUsers = searchTerm 
+                ? users.filter(user => 
+                    user.nome.toLowerCase().includes(searchTerm) || 
+                    user.email.toLowerCase().includes(searchTerm)
+                  )
+                : users;
+            
+            filteredUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="p-3">${user.id}</td>
+                    <td class="p-3">${user.nome}</td>
+                    <td class="p-3">${new Date(user.data_nascimento).toLocaleDateString('pt-BR')}</td>
+                    <td class="p-3">${user.email}</td>
+                    <td class="p-3">${user.endereco}</td>
+                    <td class="p-3">
+                        <button onclick="editUser(${user.id})" class="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition">Editar</button>
+                        <button onclick="deleteUser(${user.id})" class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition ml-2">Excluir</button>
+                    </td>
+                `;
+                userList.appendChild(row);
+            });
+        }
+
+        function editUser(id) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(user => user.id === id);
+            if (user) {
+                document.getElementById('editId').value = user.id;
+                document.getElementById('editNome').value = user.nome;
+                document.getElementById('editDataNascimento').value = user.data_nascimento;
+                document.getElementById('editEmail').value = user.email;
+                document.getElementById('editEndereco').value = user.endereco;
+                document.getElementById('editModal').classList.remove('hidden');
+                console.log('Editando aluno:', user); // Debug
+            }
+        }
+
+        function deleteUser(id) {
+            if (!confirm('Tá sure que quer tirar esse aluno da academia, mano?')) {
+                return;
+            }
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            users = users.filter(user => user.id !== id);
+            localStorage.setItem('users', JSON.stringify(users));
+            console.log('Aluno excluído, ID:', id); // Debug
+            renderUsers();
+        }
+
+        /* 
+        // Exemplo de integração com backend (descomente pra usar com uma API)
+        document.getElementById('userForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const nome = document.getElementById('nome').value.trim();
+            const data_nascimento = document.getElementById('data_nascimento').value;
+            const email = document.getElementById('email').value.trim();
+            const endereco = document.getElementById('endereco').value.trim();
+            
+            if (!nome || !data_nascimento || !email || !endereco) {
+                alert('Preencha todos os campos, mano!');
+                return;
+            }
+            
+            if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                alert('E-mail inválido, mano! Tem que ter @ e um domínio tipo .com');
+                return;
+            }
+            
+            try {
+                const response = await fetch('https://api.exemplo.com/alunos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, data_nascimento, email, endereco })
+                });
+                if (response.ok) {
+                    document.getElementById('userForm').reset();
+                    renderUsers();
+                } else {
+                    alert('Erro ao salvar no servidor, mano!');
+                }
+            } catch (error) {
+                alert('Problema na conexão com o servidor, mano!');
+            }
+        });
+        */
+
+        renderUsers();
+    </script>
 </body>
 </html>
